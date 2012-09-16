@@ -55,5 +55,6 @@
     (let ((file (match-string 1 output))
           (line (string-to-int (match-string 2 output))))
       (find-file file)
-      (goto-line line))))
+      (goto-line line)
+      (recenter-top-bottom))))
 (provide 'rake)
