@@ -34,9 +34,9 @@
      collect (replace-regexp-in-string "^rake " "" line)))
 
 ;;;###autoload
-(defun rake-run-task (all-tasks)
+(defun rake-run-task (all-tasks-p)
   (interactive "P")
-  (let* ((task (if all-tasks
+  (let* ((task (if all-tasks-p
                    (rake-select-task)
                    (rake-select-documented-task)))
          (command (format "rake %s" task)))
