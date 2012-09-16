@@ -48,8 +48,10 @@
   (let* ((task (rake-select-documented-task))
          (command (format "rake --silent --where %s" task))
          (output (shell-command-to-string command)))
-    (string-match "^rake [^\s]+\s+\\([^\s]+?\\):\\(.+\\):in "
-                  output)
+    (unless (string-match
+             "^rake [^\s]+\s+\\([^\s]+?\\):\\(.+\\):in "
+             output)
+      (error (format "Can not found definition for task %s" task)))
     (let ((file (match-string 1 output))
           (line (string-to-int (match-string 2 output))))
       (find-file file)
