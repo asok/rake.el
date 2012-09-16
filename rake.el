@@ -41,3 +41,17 @@
                    (rake-select-documented-task)))
          (command (format "rake %s" task)))
     (shell-command command)))
+
+;;;###autoload
+(defun rake-goto-task-definition ()
+  (interactive)
+  (let* ((task (rake-select-documented-task))
+         (command (format "rake --silent --where %s" task))
+         (output (shell-command-to-string command)))
+    (string-match "^rake [^\s]+\s+\\([^\s]+?\\):\\(.+\\):in "
+                  output)
+    (let ((file (match-string 1 output))
+          (line (string-to-int (match-string 2 output))))
+      (find-file file)
+      (goto-line line))))
+(provide 'rake)
