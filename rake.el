@@ -7,10 +7,9 @@
 (define-compilation-mode rake-mode "Rake" "Mode for running rake tasks.")
 
 (add-hook 'rake-filter-hook
-          (defun colorize-compilation-buffer ()
-            (toggle-read-only)
-            (ansi-color-apply-on-region (point-min) (point-max))
-            (toggle-read-only)))
+          (defun rake-colorize-buffer ()
+            (let ((inhibit-read-only t))
+              (ansi-color-apply-on-region (point-min) (point-max)))))
 
 (defun rake-get-raw-tasks-string ()
   (message "Getting list of rake tasks...")
