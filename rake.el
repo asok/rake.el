@@ -43,6 +43,8 @@
       (error (format "Failed to find source for task %s" task)))
     (let ((file (match-string 1 output))
           (line (string-to-number (match-string 2 output))))
+      (unless (file-exists-p file)
+        (error (format "File %s does not exist" file)))
       (find-file file)
       (goto-char (point-min))
       (forward-line (1- line))
