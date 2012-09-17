@@ -1,6 +1,8 @@
 (eval-when-compile
   (require 'cl))
 
+(require 'compile)
+
 (defun rake-get-raw-tasks-string ()
   (message "Getting list of rake tasks...")
   (shell-command-to-string "rake --tasks --silent"))
@@ -27,7 +29,7 @@
   (interactive)
   (let* ((task (rake-select-task))
          (command (format "rake %s" task)))
-    (shell-command command)))
+    (compile command)))
 
 (defalias 'rake 'rake-run-task)
 
