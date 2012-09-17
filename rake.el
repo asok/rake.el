@@ -4,7 +4,6 @@
 (require 'compile)
 (require 'ansi-color)
 
-
 (define-compilation-mode rake-mode "Rake" "Mode for running rake tasks.")
 
 (add-hook 'rake-filter-hook
@@ -63,5 +62,3 @@
       (recenter-top-bottom))))
 
 (provide 'rake)
-
-(define-key global-map (kbd "C-c r") 'rake)
