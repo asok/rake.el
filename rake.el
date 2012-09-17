@@ -29,6 +29,8 @@
          (command (format "rake %s" task)))
     (shell-command command)))
 
+(defalias 'rake 'rake-run-task)
+
 ;;;###autoload
 (defun rake-goto-task-definition ()
   (interactive)
