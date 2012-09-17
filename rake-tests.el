@@ -32,3 +32,7 @@
     (rake-get-list-of-task-lines
      "just\nsome\nrubbish")
     nil)))
+
+;; Local Variables:
+;; no-byte-compile: t
+;; End:
