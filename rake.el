@@ -5,17 +5,13 @@
 (require 'ansi-color)
 
 
-(define-derived-mode rake-mode compilation-mode "Rake")
+(define-compilation-mode rake-mode "Rake" "Mode for running rake tasks.")
 
-(add-hook 'rake-mode-hook
-          (lambda ()
-            (add-hook 'compilation-filter-hook
-                      (defun colorize-compilation-buffer ()
-                        (toggle-read-only)
-                        (ansi-color-apply-on-region (point-min) (point-max))
-                        (toggle-read-only))
-                      nil
-                      'make-it-local)))
+(add-hook 'rake-filter-hook
+          (defun colorize-compilation-buffer ()
+            (toggle-read-only)
+            (ansi-color-apply-on-region (point-min) (point-max))
+            (toggle-read-only)))
 
 (defun rake-get-raw-tasks-string ()
   (message "Getting list of rake tasks...")
@@ -67,3 +63,5 @@
       (recenter-top-bottom))))
 
 (provide 'rake)
+
+(define-key global-map (kbd "C-c r") 'rake)
