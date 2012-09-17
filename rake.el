@@ -43,7 +43,7 @@
   (interactive)
   (let* ((task (rake-select-task))
          (command (format "rake %s" task)))
-    (compile command)))
+    (compilation-start command 'rake-mode)))
 
 (defalias 'rake 'rake-run-task)
 
