@@ -42,9 +42,10 @@
              output)
       (error (format "Failed to find source for task %s" task)))
     (let ((file (match-string 1 output))
-          (line (string-to-int (match-string 2 output))))
+          (line (string-to-number (match-string 2 output))))
       (find-file file)
-      (goto-line line)
+      (goto-char (point-min))
+      (forward-line (1- line))
       (recenter-top-bottom))))
 
 (provide 'rake)
