@@ -4,11 +4,18 @@
 (require 'compile)
 (require 'ansi-color)
 
-(add-hook 'compilation-filter-hook
-          (defun colorize-compilation-buffer ()
-            (toggle-read-only)
-            (ansi-color-apply-on-region (point-min) (point-max))
-            (toggle-read-only)))
+
+(define-derived-mode rake-mode compilation-mode "Rake")
+
+(add-hook 'rake-mode-hook
+          (lambda ()
+            (add-hook 'compilation-filter-hook
+                      (defun colorize-compilation-buffer ()
+                        (toggle-read-only)
+                        (ansi-color-apply-on-region (point-min) (point-max))
+                        (toggle-read-only))
+                      nil
+                      'make-it-local)))
 
 (defun rake-get-raw-tasks-string ()
   (message "Getting list of rake tasks...")
