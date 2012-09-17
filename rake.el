@@ -15,37 +15,24 @@
      if (string-match-p "^rake " line)
      collect (replace-regexp-in-string "^rake " "" line)))
 
-(defun rake-select-documented-task ()
+(defun rake-select-task ()
   (let* ((tasks (rake-get-list-of-task-lines
                  (rake-get-raw-tasks-string)))
          (selected-row (ido-completing-read
                         "Run rake task: " tasks)))
     (rake-extract-task-name selected-row)))
 
-(defun rake-select-task ()
-  (ido-completing-read "Run rake task: " (rake-get-all-tasks)))
-
-(defun rake-get-all-tasks ()
-  "Get list of all available rake tasks"
-  (loop
-     with raw = (shell-command-to-string "rake --prereqs --silent")
-     for line in (split-string raw "\n")
-     if (string-match-p "^rake " line)
-     collect (replace-regexp-in-string "^rake " "" line)))
-
 ;;;###autoload
-(defun rake-run-task (all-tasks-p)
-  (interactive "P")
-  (let* ((task (if all-tasks-p
-                   (rake-select-task)
-                   (rake-select-documented-task)))
+(defun rake-run-task ()
+  (interactive)
+  (let* ((task (rake-select-task))
          (command (format "rake %s" task)))
     (shell-command command)))
 
 ;;;###autoload
 (defun rake-goto-task-definition ()
   (interactive)
-  (let* ((task (rake-select-documented-task))
+  (let* ((task (rake-select-task))
          (command (format "rake --silent --where %s" task))
          (output (shell-command-to-string command)))
     (unless (string-match
@@ -57,4 +44,5 @@
       (find-file file)
       (goto-line line)
       (recenter-top-bottom))))
+
 (provide 'rake)
