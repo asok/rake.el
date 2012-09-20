@@ -4,8 +4,13 @@
 (require 'compile)
 (require 'ansi-color)
 
+(defvar rake-scope nil)
+
 (define-compilation-mode rake-mode "Rake" "Mode for running rake tasks.")
 
+(setq rake-scroll-output t)
+
+(add-hook 'rake-start-hook (lambda () (goto-char (point-max))))
 (add-hook 'rake-filter-hook
           (defun rake-colorize-buffer ()
             (let ((inhibit-read-only t))
@@ -13,7 +18,19 @@
 
 (defun rake-get-raw-tasks-string ()
   (message "Getting list of rake tasks...")
-  (shell-command-to-string "rake --tasks --silent"))
+  (let ((options '("--tasks" "--silent"))
+        command)
+    (cond
+      ((eq rake-scope 'local)
+       (push "--no-system" options))
+      ((eq rake-scope 'system)
+       (push "--system" options))
+      (t
+       (error "No scope specified.")))
+    (setq command
+          (format "rake %s"
+                  (mapconcat 'identity options " ")))
+    (shell-command-to-string command)))
 
 (defun rake-extract-task-name (line)
   (when (string-match "^\\(.+?\\)\s+?# .+" line)
@@ -29,17 +46,60 @@
   (let* ((tasks (rake-get-list-of-task-lines
                  (rake-get-raw-tasks-string)))
          (selected-row (ido-completing-read
-                        "Run rake task: " tasks)))
-    (rake-extract-task-name selected-row)))
+                        "Run rake task: "
+                        tasks
+                        nil             ; predicate
+                        'require-match
+                        nil             ; initial input
+                        nil             ; hist
+                        "*default*")))
+    (or
+     (rake-extract-task-name selected-row)
+     "default")))
+
+(defun rake-find-rakefile-directory ()
+  (let ((current-dir  (file-name-as-directory default-directory)))
+    (flet ((goto-parent-directory ()
+             (setq current-dir
+                   (file-name-as-directory
+                    (expand-file-name ".." current-dir))))
+
+           (reached-filesystem-root-p ()
+             (equal current-dir "/")))
+      (loop
+         if (reached-filesystem-root-p)
+         return (error "No Rakefile found (looking for: rakefile, Rakefile, rakefile.rb, Rakefile.rb)")
+         if (loop
+               for rakefile in '("rakefile" "Rakefile" "rakefile.rb" "Rakefile.rb")
+               thereis (file-regular-p (expand-file-name rakefile current-dir)))
+         return current-dir
+         do
+           (goto-parent-directory)))))
 
 ;;;###autoload
 (defun rake-run-task ()
   (interactive)
-  (let* ((task (rake-select-task))
-         (command (format "rake %s" task)))
+  (let* ((default-directory (rake-find-rakefile-directory))
+         (rake-scope 'local)
+         (task (rake-select-task))
+         (command (format "rake --no-system %s" task)))
     (compilation-start command 'rake-mode)))
 
-(defalias 'rake 'rake-run-task)
+;;;###autoload
+(defun rake-run-system-task ()
+  (interactive)
+  (let* ((rake-scope 'system)
+         (task (rake-select-task))
+         (command (format "rake --system %s" task)))
+    (compilation-start command 'rake-mode)))
+
+;;;###autoload
+(defun rake (system-tasks)
+  (interactive "P")
+  (call-interactively
+   (if system-tasks
+       'rake-run-system-task
+       'rake-run-task)))
 
 ;;;###autoload
 (defun rake-goto-task-definition ()
