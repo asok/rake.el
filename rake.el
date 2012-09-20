@@ -3,6 +3,7 @@
 
 (require 'compile)
 (require 'ansi-color)
+(require 'find-cmd)
 
 (defvar rake-scope nil)
 
@@ -60,7 +61,7 @@
      "default")))
 
 (defun rake-find-rakefile-directory ()
-  (let ((current-dir  (file-name-as-directory default-directory)))
+  (let ((current-dir (file-name-as-directory default-directory)))
     (flet ((goto-parent-directory ()
              (setq current-dir
                    (file-name-as-directory
