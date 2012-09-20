@@ -45,6 +45,8 @@
 (defun rake-select-task ()
   (let* ((tasks (rake-get-list-of-task-lines
                  (rake-get-raw-tasks-string)))
+         (ido-decorations '("\n-> " "" "\n   " "\n   ..." "[" "]"
+                            " [No match]" " [Matched]" " [Not readable]" " [Too big]" " [Confirm]"))
          (selected-row (ido-completing-read
                         "Run rake task: "
                         tasks
