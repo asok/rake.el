@@ -67,14 +67,13 @@
            (reached-filesystem-root-p ()
              (equal current-dir "/")))
       (loop
-         if (reached-filesystem-root-p)
-         return (error "No Rakefile found (looking for: rakefile, Rakefile, rakefile.rb, Rakefile.rb)")
-         if (loop
-               for rakefile in '("rakefile" "Rakefile" "rakefile.rb" "Rakefile.rb")
-               thereis (file-regular-p (expand-file-name rakefile current-dir)))
-         return current-dir
-         do
-           (goto-parent-directory)))))
+         (when (reached-filesystem-root-p)
+           (error "No Rakefile found (looking for: rakefile, Rakefile, rakefile.rb, Rakefile.rb)"))
+         (when (loop
+                  for rakefile in '("rakefile" "Rakefile" "rakefile.rb" "Rakefile.rb")
+                  thereis (file-regular-p (expand-file-name rakefile current-dir)))
+           (return current-dir))
+         (goto-parent-directory)))))
 
 ;;;###autoload
 (defun rake-run-task ()
