@@ -1,7 +1,14 @@
+# rake.el #
+
 Rake task runner for GNU Emacs.
 
-
 ![screenshot](https://github.com/vderyagin/rake.el/raw/master/screenshot.png)
+
+## Installation ##
+
+Download `rake.el` from this repository, put it on Emacs `load-path`,
+put `(require 'rake)` in your initialization file. Now you can use `M-x rake`
+to run rake tasks, `C-u M-x rake` to run global rake tasks.
 
 
 ## Problems ##
