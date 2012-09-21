@@ -73,20 +73,15 @@
      collect (replace-regexp-in-string "^rake " "" line)))
 
 (defun rake-select-task ()
-  (let* ((tasks (rake-get-list-of-task-lines
-                 (rake-get-raw-tasks-string)))
-         (ido-decorations '("\n-> " "" "\n   " "\n   ..." "[" "]"
-                            " [No match]" " [Matched]" " [Not readable]" " [Too big]" " [Confirm]"))
-         (selected-row (ido-completing-read
-                        "Run rake task: "
-                        tasks
-                        nil             ; predicate
-                        'require-match
-                        nil             ; initial input
-                        nil             ; hist
-                        "*default*")))
+  (let ((tasks (rake-get-list-of-task-lines (rake-get-raw-tasks-string)))
+        (ido-decorations '("\n-> " "" "\n   " "\n   ..." "[" "]" " [No match]" " [Matched]" " [Not readable]" " [Too big]" " [Confirm]"))
+        selected)
+    (setq selected
+          (ido-completing-read "Run rake task: " tasks
+                               nil 'require-match nil nil
+                               "*default*"))
     (or
-     (rake-extract-task-name selected-row)
+     (rake-extract-task-name selected)
      "default")))
 
 (defun rake-find-rakefile-directory ()
