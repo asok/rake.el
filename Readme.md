@@ -10,6 +10,15 @@ Download `rake.el` from this repository, put it on Emacs `load-path`,
 put `(require 'rake)` in your initialization file. Now you can use `M-x rake`
 to run rake tasks, `C-u M-x rake` to run global rake tasks.
 
+Alternatively, If you are using [el-get](https://github.com/dimitri/el-get),
+use this recipe:
+
+``` lisp
+(:name rake.el
+       :type github
+       :pkgname "vderyagin/rake.el")
+```
+
 
 ## Problems ##
 
