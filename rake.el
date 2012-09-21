@@ -106,18 +106,14 @@
            (return current-dir))
          (goto-parent-directory)))))
 
-;;;###autoload
 (defun rake-run-task ()
-  (interactive)
   (let* ((default-directory (rake-find-rakefile-directory))
          (rake-scope 'local)
          (task (rake-select-task))
          (command (format "rake --no-system %s" task)))
     (compilation-start command 'rake-mode)))
 
-;;;###autoload
 (defun rake-run-system-task ()
-  (interactive)
   (let* ((rake-scope 'system)
          (task (rake-select-task))
          (command (format "rake --system %s" task)))
@@ -126,10 +122,9 @@
 ;;;###autoload
 (defun rake (system-tasks)
   (interactive "P")
-  (call-interactively
-   (if system-tasks
-       'rake-run-system-task
-       'rake-run-task)))
+  (if system-tasks
+      (rake-run-system-task)
+      (rake-run-task)))
 
 ;;;###autoload
 (defun rake-goto-task-definition ()
