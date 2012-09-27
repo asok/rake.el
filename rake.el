@@ -144,3 +144,8 @@
 (provide 'rake)
 
 ;;; rake.el ends here
+
+;; Local Variables:
+;; lexical-binding: t
+;; coding: us-ascii
+;; End:
