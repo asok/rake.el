@@ -134,11 +134,6 @@
 (define-compilation-mode rake-mode "Rake"
   "Mode for running rake tasks."
   (set (make-local-variable 'compilation-scroll-output) t)
-  (add-hook 'compilation-start-hook
-            (lambda (process)
-              (goto-char (point-max)))
-            nil
-            'make-it-local)
   (add-hook 'compilation-filter-hook
             (lambda ()
               (let ((inhibit-read-only t))
