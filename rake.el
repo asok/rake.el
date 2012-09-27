@@ -32,7 +32,7 @@
 
 (require 'compile)
 (require 'ansi-color)
-(require 'find-cmd)
+(require 'ido)
 
 (defvar rake-scope nil)
 
