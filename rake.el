@@ -131,15 +131,20 @@
       (recenter-top-bottom))))
 
 
-(defun rake-colorize-buffer ()
-  (let ((inhibit-read-only t))
-    (ansi-color-apply-on-region (point-min) (point-max))))
-
 (define-compilation-mode rake-mode "Rake"
   "Mode for running rake tasks."
   (set (make-local-variable 'compilation-scroll-output) t)
-  (add-hook 'compilation-start-hook (lambda () (goto-char (point-max))) nil 'make-it-local)
-  (add-hook 'compilation-filter-hook 'rake-colorize-buffer nil 'make-it-local))
+  (add-hook 'compilation-start-hook
+            (lambda (process)
+              (goto-char (point-max)))
+            nil
+            'make-it-local)
+  (add-hook 'compilation-filter-hook
+            (lambda ()
+              (let ((inhibit-read-only t))
+                (ansi-color-apply-on-region (point-min) (point-max))))
+            nil
+            'make-it-local))
 
 (provide 'rake)
 
