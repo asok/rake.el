@@ -52,16 +52,17 @@ Return global rake tasks if GLOBAL-P is non-nil."
        collect (replace-regexp-in-string "^rake " "" line))))
 
 (defun rake-select-task (&optional global-p)
-  (let ((tasks (rake-tasks-with-comments global-p))
-        (ido-decorations '("\n-> " "" "\n   " "\n   ..." "[" "]" " [No match]" " [Matched]" " [Not readable]" " [Too big]" " [Confirm]"))
-        selected)
-    (setq selected
+  (let* ((tasks
+          (rake-tasks-with-comments global-p))
+         (ido-decorations
+          '("\n-> " "" "\n   " "\n   ..." "[" "]" " [No match]" " [Matched]" " [Not readable]" " [Too big]" " [Confirm]"))
+         (selected
           (ido-completing-read "Run rake task: " tasks
                                nil 'require-match nil nil
-                               "*default*"))
-    (or
-     (rake-extract-task-name selected)
-     "default")))
+                               (format "%-25s # %s"
+                                       "default"
+                                       "Run default task if available."))))
+    (rake-extract-task-name selected)))
 
 (defun rake-find-rakefile-directory ()
   (let ((current-dir (file-name-as-directory default-directory)))
