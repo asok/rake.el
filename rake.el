@@ -99,10 +99,10 @@ Return global rake tasks if GLOBAL-P is non-nil."
     (compilation-start command 'rake-mode)))
 
 ;;;###autoload
-(defun rake-goto-task-definition ()
-  (interactive)
-  (let* ((task (rake-select-task))
-         (command (format "rake --silent --where %s" task))
+(defun rake-goto-task-definition (&optional global-p)
+  (interactive "P")
+  (let* ((task (rake-select-task global-p))
+         (command (mapconcat 'identity (list "rake" (if global-p "--system" "--no-system") "--silent" "--where" task) " "))
          (output (shell-command-to-string command)))
     (unless (string-match
              "^rake [^\s]+\s+\\([^\s]+?\\):\\(.+\\):in "
