@@ -65,21 +65,25 @@ Return global rake tasks if GLOBAL-P is non-nil."
     (rake-extract-task-name selected)))
 
 (defun rake-find-rakefile-directory ()
-  (let ((current-dir (file-name-as-directory default-directory)))
-    (flet ((goto-parent-directory ()
-             (setq current-dir
-                   (file-name-as-directory
-                    (expand-file-name ".." current-dir))))
-           (reached-filesystem-root-p ()
-             (equal current-dir "/")))
-      (loop
-         (when (reached-filesystem-root-p)
-           (error "No Rakefile found (looking for: rakefile, Rakefile, rakefile.rb, Rakefile.rb)"))
-         (when (loop
-                  for rakefile in '("rakefile" "Rakefile" "rakefile.rb" "Rakefile.rb")
-                  thereis (file-regular-p (expand-file-name rakefile current-dir)))
-           (return current-dir))
-         (goto-parent-directory)))))
+  (let ((rakefile (rake-find-rakefile)))
+    (if rakefile
+        (file-name-directory rakefile)
+        (error "No Rakefile found (looking for: rakefile, Rakefile, rakefile.rb, Rakefile.rb)"))))
+
+(defun* rake-find-rakefile ()
+  (loop
+     with current-dir = (file-name-as-directory default-directory)
+     until (equal current-dir "/")
+     do
+       (loop
+          for file-name in '("rakefile" "Rakefile" "rakefile.rb" "Rakefile.rb")
+          for rakefile = (expand-file-name file-name current-dir)
+          if (file-regular-p rakefile)
+          do
+            (return-from rake-find-rakefile rakefile))
+       (setq current-dir
+             (file-name-as-directory
+              (expand-file-name ".." current-dir)))))
 
 ;;;###autoload
 (defun rake (&optional global-p)
