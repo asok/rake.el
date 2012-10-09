@@ -84,7 +84,13 @@ Return global rake tasks if GLOBAL-P is non-nil."
 ;;;###autoload
 (defun rake (&optional global-p)
   (interactive "P")
-  (let* ((task
+  (let* ((default-directory
+          (or
+           (and
+            (not global-p)
+            (rake-find-rakefile-directory))
+           default-directory))
+         (task
           (rake-select-task global-p))
          (command
           (mapconcat 'identity
