@@ -46,7 +46,7 @@
       ((eq rake-scope 'system)
        (push "--system" options))
       (t
-       (error "No scope specified.")))
+       (error "No scope specified")))
     (setq command
           (format "rake %s"
                   (mapconcat 'identity options " ")))
