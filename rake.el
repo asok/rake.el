@@ -122,6 +122,11 @@ Return global rake tasks if GLOBAL-P is non-nil."
       (recenter-top-bottom))))
 
 
+(defun file-last-modified-at (file)
+  "Return number of seconds since 1970-01-01 00:00:00 +0000 at the time FILE was last modified."
+  (string-to-number
+   (format-time-string "%s" (nth 5 (file-attributes file)))))
+
 (define-compilation-mode rake-mode "Rake"
   "Mode for running rake tasks."
   (set (make-local-variable 'compilation-scroll-output) t)
