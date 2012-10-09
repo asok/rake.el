@@ -34,36 +34,25 @@
 (require 'ansi-color)
 (require 'ido)
 
-(defvar rake-scope nil)
-
-(defun rake-get-raw-tasks-string ()
-  (message "Getting list of rake tasks...")
-  (let ((options '("--tasks" "--silent"))
-        command)
-    (cond
-      ((eq rake-scope 'local)
-       (push "--no-system" options))
-      ((eq rake-scope 'system)
-       (push "--system" options))
-      (t
-       (error "No scope specified")))
-    (setq command
-          (format "rake %s"
-                  (mapconcat 'identity options " ")))
-    (shell-command-to-string command)))
 
 (defun rake-extract-task-name (line)
   (when (string-match "^\\(.+?\\)\s+?# .+" line)
     (match-string 1 line)))
 
-(defun rake-get-list-of-task-lines (raw-tasks-list)
-  (loop
-     for line in (split-string raw-tasks-list "\n")
-     if (string-match-p "^rake " line)
-     collect (replace-regexp-in-string "^rake " "" line)))
+(defun rake-tasks-with-comments (&optional global-p)
+  "Return list of rake tasks (with comments) for current location.
+Return global rake tasks if GLOBAL-P is non-nil."
+  (let* ((command
+          (list "rake" "--tasks" "--silent" (if global-p "--system" "--no-system")))
+         (output
+          (shell-command-to-string (mapconcat 'identity command " "))))
+    (loop
+       for line in (split-string output "\n")
+       if (string-match-p "^rake " line)
+       collect (replace-regexp-in-string "^rake " "" line))))
 
-(defun rake-select-task ()
-  (let ((tasks (rake-get-list-of-task-lines (rake-get-raw-tasks-string)))
+(defun rake-select-task (&optional global-p)
+  (let ((tasks (rake-tasks-with-comments global-p))
         (ido-decorations '("\n-> " "" "\n   " "\n   ..." "[" "]" " [No match]" " [Matched]" " [Not readable]" " [Too big]" " [Confirm]"))
         selected)
     (setq selected
@@ -91,25 +80,16 @@
            (return current-dir))
          (goto-parent-directory)))))
 
-(defun rake-run-task ()
-  (let* ((default-directory (rake-find-rakefile-directory))
-         (rake-scope 'local)
-         (task (rake-select-task))
-         (command (format "rake --no-system %s" task)))
-    (compilation-start command 'rake-mode)))
-
-(defun rake-run-system-task ()
-  (let* ((rake-scope 'system)
-         (task (rake-select-task))
-         (command (format "rake --system %s" task)))
-    (compilation-start command 'rake-mode)))
-
 ;;;###autoload
-(defun rake (system-tasks)
+(defun rake (&optional global-p)
   (interactive "P")
-  (if system-tasks
-      (rake-run-system-task)
-      (rake-run-task)))
+  (let* ((task
+          (rake-select-task global-p))
+         (command
+          (mapconcat 'identity
+                     (list "rake" (if global-p "--system" "--no-system") task)
+                     " ")))
+    (compilation-start command 'rake-mode)))
 
 ;;;###autoload
 (defun rake-goto-task-definition ()
