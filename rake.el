@@ -70,17 +70,15 @@ Return global rake tasks if GLOBAL-P is non-nil."
         (file-name-directory rakefile)
         (error "No Rakefile found (looking for: rakefile, Rakefile, rakefile.rb, Rakefile.rb)"))))
 
-(defun* rake-find-rakefile ()
+(defun rake-find-rakefile ()
   (loop
      with current-dir = (file-name-as-directory default-directory)
      until (equal current-dir "/")
+     thereis (loop
+                for file-name in '("rakefile" "Rakefile" "rakefile.rb" "Rakefile.rb")
+                for rakefile = (expand-file-name file-name current-dir)
+                if (file-regular-p rakefile) return rakefile)
      do
-       (loop
-          for file-name in '("rakefile" "Rakefile" "rakefile.rb" "Rakefile.rb")
-          for rakefile = (expand-file-name file-name current-dir)
-          if (file-regular-p rakefile)
-          do
-            (return-from rake-find-rakefile rakefile))
        (setq current-dir
              (file-name-as-directory
               (expand-file-name ".." current-dir)))))
