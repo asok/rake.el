@@ -35,6 +35,23 @@
 (require 'ido)
 
 (defvar rake--tasks-scope nil)
+(defvar rake-use-bundler nil
+  "Non-nil means use bundler for executing rake whenever available.")
+
+(defun rake--command ()
+  "Return string representing partial rake command to execute."
+  (let ((command '("rake")))
+    (when (and
+           rake-use-bundler
+           (not (member rake--tasks-scope '("-g" "--system")))
+           (executable-find "bundle")
+           (file-exists-p (expand-file-name "../Gemfile" (rake-find-rakefile))))
+      (setq command
+            (append '("bundle" "exec") command)))
+    (mapconcat
+     'identity
+     (append command (list rake--tasks-scope))
+     " ")))
 
 (defun rake-extract-task-name (line)
   (when (string-match "^\\(.+?\\)\s+?# .+" line)
@@ -43,7 +60,7 @@
 (defun rake-tasks-with-comments ()
   "Return list of rake tasks (with comments) for current location."
   (let* ((command
-          (list "rake" "--tasks" "--silent" rake--tasks-scope))
+          (list (rake--command) "--tasks" "--silent"))
          (output
           (shell-command-to-string (mapconcat 'identity command " "))))
     (loop
@@ -97,7 +114,7 @@
           (rake-select-task))
          (command
           (mapconcat 'identity
-                     (list "rake" rake--tasks-scope task)
+                     (list (rake--command) task)
                      " ")))
     (compilation-start command 'rake-mode)))
 
@@ -106,7 +123,7 @@
   (interactive "P")
   (let* ((rake--tasks-scope (if system-wide "--system" "--no-system"))
          (task (rake-select-task))
-         (command (mapconcat 'identity (list "rake" rake--tasks-scope "--silent" "--where" task) " "))
+         (command (mapconcat 'identity (list (rake--command) "--silent" "--where" task) " "))
          (output (shell-command-to-string command)))
     (unless (string-match
              "^rake [^\s]+\s+\\([^\s]+?\\):\\(.+\\):in "
