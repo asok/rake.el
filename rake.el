@@ -84,13 +84,13 @@
               (expand-file-name ".." current-dir)))))
 
 ;;;###autoload
-(defun rake (&optional global)
+(defun rake (&optional system-wide)
   (interactive "P")
-  (let* ((rake--tasks-scope (if global "--system" "--no-system"))
+  (let* ((rake--tasks-scope (if system-wide "--system" "--no-system"))
          (default-directory
           (or
            (and
-            (not global)
+            (not system-wide)
             (rake-find-rakefile-directory))
            default-directory))
          (task
@@ -102,9 +102,9 @@
     (compilation-start command 'rake-mode)))
 
 ;;;###autoload
-(defun rake-goto-task-definition (&optional global)
+(defun rake-goto-task-definition (&optional system-wide)
   (interactive "P")
-  (let* ((rake--tasks-scope (if global "--system" "--no-system"))
+  (let* ((rake--tasks-scope (if system-wide "--system" "--no-system"))
          (task (rake-select-task))
          (command (mapconcat 'identity (list "rake" rake--tasks-scope "--silent" "--where" task) " "))
          (output (shell-command-to-string command)))
