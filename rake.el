@@ -4,7 +4,7 @@
 
 ;; Author: Victor Deryagin <vderyagin@gmail.com>
 ;; Created: 16 Sep 2012
-;; Version: 0.0.1
+;; Version: 0.1.0
 
 ;; This file is not part of GNU Emacs.
 
